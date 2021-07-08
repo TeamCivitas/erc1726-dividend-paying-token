@@ -1,15 +1,15 @@
 pragma solidity ^0.8.4;
 
 //import "openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol";
-import "./DividendPayingTokenInterface.sol";
-import "./DividendPayingTokenOptionalInterface.sol";
+import "./IDividendPayingToken.sol";
+import "./IDividendPayingTokenOptional.sol";
 
 /// @title Dividend-Paying Token
 /// @author Roger Wu (https://github.com/roger-wu)
 /// @dev A mintable ERC20 token that allows anyone to pay and distribute ether
 ///  to token holders as dividends and allows token holders to withdraw their dividends.
 ///  Reference: the source code of PoWH3D: https://etherscan.io/address/0xB3775fB83F7D12A36E0475aBdD1FCA35c091efBe#code
-contract DividendPayingToken is ERC20Mintable, DividendPayingTokenInterface, DividendPayingTokenOptionalInterface {
+contract DividendPayingToken is ERC20Mintable, IDividendPayingToken, DividendPayingTokenOptional {
 
   // With `magnitude`, we can properly distribute dividends even if the amount of received ether is small.
   // For more discussion about choosing the value of `magnitude`,
