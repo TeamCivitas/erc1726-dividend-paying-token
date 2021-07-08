@@ -1,10 +1,8 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.8.4;
 
-import "openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol";
+//import "openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol";
 import "./DividendPayingTokenInterface.sol";
 import "./DividendPayingTokenOptionalInterface.sol";
-import "./math/SafeMathUint.sol";
-import "./math/SafeMathInt.sol";
 
 /// @title Dividend-Paying Token
 /// @author Roger Wu (https://github.com/roger-wu)
@@ -12,9 +10,6 @@ import "./math/SafeMathInt.sol";
 ///  to token holders as dividends and allows token holders to withdraw their dividends.
 ///  Reference: the source code of PoWH3D: https://etherscan.io/address/0xB3775fB83F7D12A36E0475aBdD1FCA35c091efBe#code
 contract DividendPayingToken is ERC20Mintable, DividendPayingTokenInterface, DividendPayingTokenOptionalInterface {
-  using SafeMath for uint256;
-  using SafeMathUint for uint256;
-  using SafeMathInt for int256;
 
   // With `magnitude`, we can properly distribute dividends even if the amount of received ether is small.
   // For more discussion about choosing the value of `magnitude`,
