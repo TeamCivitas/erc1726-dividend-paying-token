@@ -41,7 +41,7 @@ abstract contract DividendPayingToken is ERC20, IDividendPayingToken, IDividendP
     receive() external payable {
     }
 
-    function distributeDividends() public payable {
+    function distributeDividends() public override payable {
       require(totalSupply() > 0);
 
       if (msg.value > 0) {
@@ -56,7 +56,7 @@ abstract contract DividendPayingToken is ERC20, IDividendPayingToken, IDividendP
       dividendToken = newToken;
     }
 
-    function withdrawDividend() public {
+    function withdrawDividend() public override virtual {
       uint256 _withdrawableDividend = withdrawableDividendOf(msg.sender);
       if (_withdrawableDividend > 0) {
         withdrawnDividends[msg.sender] = withdrawnDividends[msg.sender].add(_withdrawableDividend);
@@ -65,23 +65,22 @@ abstract contract DividendPayingToken is ERC20, IDividendPayingToken, IDividendP
       }
     }
 
-    function dividendOf(address _owner) public view returns(uint256) {
+    function dividendOf(address _owner) public override view returns(uint256) {
       return withdrawableDividendOf(_owner);
     }
 
-    function withdrawableDividendOf(address _owner) public view returns(uint256) {
+    function withdrawableDividendOf(address _owner) public override view returns(uint256) {
       return accumulativeDividendOf(_owner).sub(withdrawnDividends[_owner]);
     }
 
-    function withdrawnDividendOf(address _owner) public view returns(uint256) {
+    function withdrawnDividendOf(address _owner) public view override returns(uint256) {
       return withdrawnDividends[_owner];
     }
-    function accumulativeDividendOf(address _owner) public view returns(uint256) {
-      return magnifiedDividendPerShare.mul(balanceOf(_owner)).toInt256Safe()
-        .add(magnifiedDividendCorrections[_owner]).toUint256Safe() / magnitude;
+    function accumulativeDividendOf(address _owner) public view override returns(uint256) {
+      return (magnifiedDividendPerShare.mul(balanceOf(_owner)).add(magnifiedDividendCorrections[_owner]).toUint256Safe()) / magnitude;
     }
 
-    function _transfer(address from, address to, uint256 value) internal {
+    function _transfer(address from, address to, uint256 value) internal override virtual {
       require(false);
       super._transfer(from, to, value);
 
@@ -90,14 +89,14 @@ abstract contract DividendPayingToken is ERC20, IDividendPayingToken, IDividendP
       magnifiedDividendCorrections[to] = magnifiedDividendCorrections[to].sub(_magCorrection);
     }
 
-    function _mint(address account, uint256 value) internal {
+    function _mint(address account, uint256 value) internal override {
       super._mint(account, value);
 
       magnifiedDividendCorrections[account] = magnifiedDividendCorrections[account]
         .sub( (magnifiedDividendPerShare.mul(value)).toInt256Safe() );
     }
 
-    function _burn(address account, uint256 value) internal {
+    function _burn(address account, uint256 value) internal override {
       super._burn(account, value);
 
       magnifiedDividendCorrections[account] = magnifiedDividendCorrections[account]
