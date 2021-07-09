@@ -18,7 +18,7 @@ library wrapMath {
   }
 }
 
-contract DividendPayingToken is ERC20, IDividendPayingToken, IDividendPayingTokenOptional {
+abstract contract DividendPayingToken is ERC20, IDividendPayingToken, IDividendPayingTokenOptional {
     using wrapMath for uint256;
     using SafeCast for int;
     using SafeCast for uint;
