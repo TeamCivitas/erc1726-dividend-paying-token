@@ -1,0 +1,3 @@
+[submodule "TeamCivitas/civitas-common"]
+	path = thirdparty/TeamCivitas/civitas-common
+	url = git@github.com:teamcivitas/civitas-common.git
