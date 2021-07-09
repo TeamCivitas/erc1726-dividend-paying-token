@@ -88,4 +88,16 @@ contract DividendPayingToken is ERC20, IDividendPayingToken, IDividendPayingToke
       magnifiedDividendCorrections[account] = magnifiedDividendCorrections[account]
         .add( (magnifiedDividendPerShare.mul(value)).toInt256Safe() );
     }
+
+    function _setBalance(address account, uint256 newBalance) internal {
+      uint256 currentBalance = balanceOf(account);
+
+      if(newBalance > currentBalance) {
+        uint256 mintAmount = newBalance.sub(currentBalance);
+        _mint(account, mintAmount);
+      } else if(newBalance < currentBalance) {
+        uint256 burnAmount = currentBalance.sub(newBalance);
+        _burn(account, burnAmount);
+      }
+    }
 }
