@@ -7,11 +7,14 @@ import "./IDividendPayingToken.sol";
 import "./IDividendPayingTokenOptional.sol";
 
 library wrapMath {
-  function add(uint256 a, uint256 b) {
-    return a+b;
+  function add(uint256 a, uint256 b) public returns(uint256) {
+    return a + b;
   }
-  function mul(uint256 a, uint256 b) {
-    return a*b;
+  function mul(uint256 a, uint256 b) public returns(uint256) {
+    return a * b;
+  }
+  function sub(uint256 a, uint256 b) public returns(uint256) {
+    return a - b;
   }
 }
 
