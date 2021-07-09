@@ -6,8 +6,17 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "./IDividendPayingToken.sol";
 import "./IDividendPayingTokenOptional.sol";
 
-contract DividendPayingToken is ERC20, IDividendPayingToken, IDividendPayingTokenOptional {
+library wrapMath {
+  function add(uint256 a, uint256 b) {
+    return a+b;
+  }
+  function mul(uint256 a, uint256 b) {
+    return a*b;
+  }
+}
 
+contract DividendPayingToken is ERC20, IDividendPayingToken, IDividendPayingTokenOptional {
+    using wrapMath for uint256;
     uint256 constant internal magnitude = 2**128;
 
     uint256 internal magnifiedDividendPerShare;
