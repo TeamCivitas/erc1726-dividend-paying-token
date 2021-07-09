@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: ISC
 pragma solidity ^0.8.4;
 
-//import "openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol";
+import "@openzeppelin/contracts/utils/math/SafeCast.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "./IDividendPayingToken.sol";
 import "./IDividendPayingTokenOptional.sol";
@@ -20,6 +20,9 @@ library wrapMath {
 
 contract DividendPayingToken is ERC20, IDividendPayingToken, IDividendPayingTokenOptional {
     using wrapMath for uint256;
+    using SafeCast for int;
+    using SafeCast for uint;
+
     uint256 constant internal magnitude = 2**128;
 
     uint256 internal magnifiedDividendPerShare;
