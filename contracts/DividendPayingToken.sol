@@ -2,6 +2,7 @@
 pragma solidity ^0.8.4;
 
 //import "openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "./IDividendPayingToken.sol";
 import "./IDividendPayingTokenOptional.sol";
 
@@ -10,6 +11,8 @@ contract DividendPayingToken is ERC20, IDividendPayingToken, IDividendPayingToke
     uint256 constant internal magnitude = 2**128;
 
     uint256 internal magnifiedDividendPerShare;
+
+    address dividendToken;
 
     mapping(address => int256) internal magnifiedDividendCorrections;
     mapping(address => uint256) internal withdrawnDividends;
