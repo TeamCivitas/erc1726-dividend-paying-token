@@ -61,7 +61,7 @@ abstract contract DividendPayingToken is ERC20, IDividendPayingToken, IDividendP
       if (_withdrawableDividend > 0) {
         withdrawnDividends[msg.sender] = withdrawnDividends[msg.sender].add(_withdrawableDividend);
         emit DividendWithdrawn(msg.sender, _withdrawableDividend);
-        (msg.sender).transfer(_withdrawableDividend);
+        (payable(msg.sender)).transfer(_withdrawableDividend);
       }
     }
 
