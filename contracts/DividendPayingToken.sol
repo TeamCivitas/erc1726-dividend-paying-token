@@ -3,25 +3,15 @@ pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/utils/math/SafeCast.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@teamcivitas/wrap-math/contracts/utils/math/WrapMath.sol";
+
 import "./IDividendPayingToken.sol";
 import "./IDividendPayingTokenOptional.sol";
 
-library wrapMath {
-  function add(uint256 a, uint256 b) public returns(uint256) {
-    return a + b;
-  }
-  function mul(uint256 a, uint256 b) public returns(uint256) {
-    return a * b;
-  }
-  function sub(uint256 a, uint256 b) public returns(uint256) {
-    return a - b;
-  }
-}
-
 abstract contract DividendPayingToken is ERC20, IDividendPayingToken, IDividendPayingTokenOptional {
-    using wrapMath for uint256;
-    using SafeCast for int;
-    using SafeCast for uint;
+    using WrapMath for uint256;
+    using SafeCast for int256;
+    using SafeCast for uint256;
 
     uint256 constant internal magnitude = 2**128;
 
@@ -41,13 +31,15 @@ abstract contract DividendPayingToken is ERC20, IDividendPayingToken, IDividendP
     receive() external payable {
     }
 
+    constructor(string memory name, string memory symbol) ERC20(name, symbol)  {
+
+    }
+
     function distributeDividends() public override payable {
       require(totalSupply() > 0);
 
       if (msg.value > 0) {
-        magnifiedDividendPerShare = magnifiedDividendPerShare.add(
-          (msg.value).mul(magnitude) / totalSupply()
-        );
+        magnifiedDividendPerShare += (((msg.value) * magnitude) / totalSupply());
         emit DividendsDistributed(msg.sender, msg.value);
       }
     }
@@ -59,7 +51,7 @@ abstract contract DividendPayingToken is ERC20, IDividendPayingToken, IDividendP
     function withdrawDividend() public override virtual {
       uint256 _withdrawableDividend = withdrawableDividendOf(msg.sender);
       if (_withdrawableDividend > 0) {
-        withdrawnDividends[msg.sender] = withdrawnDividends[msg.sender].add(_withdrawableDividend);
+        withdrawnDividends[msg.sender] += _withdrawableDividend;
         emit DividendWithdrawn(msg.sender, _withdrawableDividend);
         (payable(msg.sender)).transfer(_withdrawableDividend);
       }
@@ -70,39 +62,36 @@ abstract contract DividendPayingToken is ERC20, IDividendPayingToken, IDividendP
     }
 
     function withdrawableDividendOf(address _owner) public override view returns(uint256) {
-      return accumulativeDividendOf(_owner).sub(withdrawnDividends[_owner]);
+      return accumulativeDividendOf(_owner) - (withdrawnDividends[_owner]);
     }
 
     function withdrawnDividendOf(address _owner) public view override returns(uint256) {
       return withdrawnDividends[_owner];
     }
     function accumulativeDividendOf(address _owner) public view override returns(uint256) {
-      return (magnifiedDividendPerShare.mul(balanceOf(_owner)).add(magnifiedDividendCorrections[_owner]).toUint256Safe()) / magnitude;
+      return uint256(int256(magnifiedDividendPerShare * (balanceOf(_owner))) + magnifiedDividendCorrections[_owner]) / magnitude;
     }
 
     function _transfer(address from, address to, uint256 value) internal override virtual {
       require(false);
       super._transfer(from, to, value);
 
-      int256 _magCorrection = magnifiedDividendPerShare.mul(value).toInt256Safe();
-      magnifiedDividendCorrections[from] = magnifiedDividendCorrections[from].add(_magCorrection);
-      magnifiedDividendCorrections[to] = magnifiedDividendCorrections[to].sub(_magCorrection);
+      int256 _magCorrection = int256(magnifiedDividendPerShare * value);
+      magnifiedDividendCorrections[from] += _magCorrection;
+      magnifiedDividendCorrections[to] -= _magCorrection;
     }
 
     function _mint(address account, uint256 value) internal override {
       super._mint(account, value);
 
-      magnifiedDividendCorrections[account] = magnifiedDividendCorrections[account]
-        .sub( (magnifiedDividendPerShare.mul(value)).toInt256Safe() );
+        magnifiedDividendCorrections[account] -= int256(magnifiedDividendPerShare * value);
     }
 
     function _burn(address account, uint256 value) internal override {
       super._burn(account, value);
 
-      magnifiedDividendCorrections[account] = magnifiedDividendCorrections[account]
-        .add( (magnifiedDividendPerShare.mul(value)).toInt256Safe() );
-    }
-
+      magnifiedDividendCorrections[account] += int256(magnifiedDividendPerShare * value);
+   }
     function _setBalance(address account, uint256 newBalance) internal {
       uint256 currentBalance = balanceOf(account);
 
