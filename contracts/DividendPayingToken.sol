@@ -3,7 +3,7 @@ pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/utils/math/SafeCast.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "@teamcivitas/wrap-math/contracts/utils/math/WrapMath.sol";
+import "@pocket-llc/wrap-math/contracts/utils/math/WrapMath.sol";
 
 import "./IDividendPayingToken.sol";
 import "./IDividendPayingTokenOptional.sol";
